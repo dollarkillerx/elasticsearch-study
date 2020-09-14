@@ -361,3 +361,178 @@ GET /summer/user/_search
   }
 }
 ```
+- 查询短句 要求 顺序且连续
+match_phrase的分词结果必须在text字段分词中都包含，而且顺序必须相同，而且必须都是连续的。
+``` 
+GET index/type/_search
+{
+    "query": {
+        "match_pharse": {
+            "tag": "  is man "  # 需要是连续且顺序的 不然会查不到
+        }
+    }
+}
+```
+- 查询短句 顺序 连续无要求
+``` 
+POST index/type/_search
+{
+    "query": {
+        "query_string": {
+            "query": "  goes to school",
+            "fields": ["tag"]
+        }
+    }
+}
+```
+
+
+### 自动检测及动态映射Dynamic Mapping
+参考: https://elasticsearch.cn/question/4930
+``` 
+{
+    "mappings":{
+        "dynamic_templates":[
+            {
+                "ik_fields":{
+                    "path_match":"ik.*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "analyzer":"ik_max_word",
+                        "search_analyzer":"ik_max_word",
+                        "type":"text"
+                    }
+                }
+            },
+            {
+                "whitespace_fields":{
+                    "path_match":"ws.*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "analyzer":"whitespace",
+                        "type":"text"
+                    }
+                }
+            },
+            {
+                "standard_fields":{
+                    "path_match":"sd.*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "analyzer":"standard",
+                        "type":"text"
+                    }
+                }
+            },
+            {
+                "keyword_fields":{
+                    "path_match":"kw.*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "analyzer":"standard",
+                        "type":"keyword"
+                    }
+                }
+            },
+            {
+                "not_indexed_fields":{
+                    "path_match":"ni.*",
+                    "match_mapping_type":"string",
+                    "mapping":{
+                        "enabled":false,
+                        "type":"object"
+                    }
+                }
+            }
+        ],
+        "properties":{
+            "ik":{
+                "properties":{
+                    "names":{
+                        "type":"text",
+                        "analyzer":"ik_max_word"
+                    },
+                    "primary_name":{
+                        "type":"text",
+                        "analyzer":"ik_max_word"
+                    }
+                }
+            },
+            "kw":{
+                "properties":{
+                    "entity_type":{
+                        "type":"long"
+                    },
+                    "id":{
+                        "type":"keyword"
+                    },
+                    "suggest_types":{
+                        "type":"long"
+                    }
+                }
+            },
+            "ni":{
+                "properties":{
+                    "logo":{
+                        "type":"object",
+                        "enabled":false
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+``` 
+{
+    "mappings" : {
+      "properties" : {
+        "ik" : {
+          "properties" : {
+            "description" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "names" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            }
+          }
+        },
+        "kw" : {
+          "properties" : {
+            "entity_type" : {
+              "type" : "long"
+            },
+            "id" : {
+              "type" : "text",
+              "fields" : {
+                "keyword" : {
+                  "type" : "keyword",
+                  "ignore_above" : 256
+                }
+              }
+            },
+            "suggest_types" : {
+              "type" : "long"
+            }
+          }
+        },
+        "ranking_score" : {
+          "type" : "float"
+        }
+      }
+    }
+}
+```
