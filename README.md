@@ -305,6 +305,23 @@ GET /summer/user/_search
         }
      }
 }
+
+{
+    "query": {
+         "bool": {
+            "must": [
+                 "match_phrase": {
+                    "names": {
+                       "query": "雷军我爱你"
+                     }
+                 },
+                 "match": {
+                        "name": "summer"
+                  }
+            ]
+        }
+     }
+}
 ```
 - should   多条件 or `select * from user wher name='summer' or nickname='dollarkiller'`
 ``` 
@@ -314,10 +331,12 @@ GET /summer/user/_search
          "bool": {
             "should": [
                 "match": {
-                    "nickname": "dollarkiller"
+                    "nickname": "dollarkiller",
+                    "boost": 5                   // 权重越大越好
                 },
                 "match": {
-                    "name": "summer"
+                    "name": "summer",
+                    "boost": 0.5                   // 权重越大越好
                 }
             ]
         }
@@ -388,7 +407,9 @@ POST index/type/_search
 
 
 ### 自动检测及动态映射Dynamic Mapping
-参考: https://elasticsearch.cn/question/4930
+参考: 
+- https://elasticsearch.cn/question/4930
+- https://www.cnblogs.com/shoufeng/p/10655797.html
 ``` 
 {
     "mappings":{
