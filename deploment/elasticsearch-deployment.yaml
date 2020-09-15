@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: elasticsearch
+  name: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: elasticsearch
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        service: elasticsearch
+    spec:
+      containers:
+      - env:
+        - name: ES_JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: cluster.initial_master_nodes
+          value: es7_01,es7_02
+        - name: cluster.name
+          value: zjc-es-cluster
+        - name: discovery.seed_hosts
+          value: es7_01
+        - name: node.name
+          value: es7_01
+        image: elasticsearch:7.2.0
+        name: es7-01
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: deploment-es7data1
+      restartPolicy: Always
+      volumes:
+      - name: deploment-es7data1
+        persistentVolumeClaim:
+          claimName: deploment-es7data1

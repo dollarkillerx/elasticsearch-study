@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: cerebro
+  name: cerebro
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: cerebro
+  template:
+    metadata:
+      labels:
+        service: cerebro
+    spec:
+      containers:
+      - args:
+        - -Dhosts.0.host=http://elasticsearch:9200
+        image: lmenezes/cerebro:0.8.3
+        imagePullPolicy: ""
+        name: cerebro
+        ports:
+        - containerPort: 9000
+      restartPolicy: Always
+

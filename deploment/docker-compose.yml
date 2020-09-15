@@ -1,125 +1,58 @@
-version: '3'
+version: '2'
 services:
-    elasticsearch_n0:
-        image: elasticsearch:7.2.0
-        container_name: elasticsearch_n0
-        privileged: true
-        environment:
-            - cluster.name=elasticsearch-cluster
-            - node.name=node0
-            - node.master=true
-            - node.data=true
-            - bootstrap.memory_lock=true
-            - search.max_buckets=100000000
-            - http.cors.enabled=true
-            - http.cors.allow-origin=*
-            - cluster.initial_master_nodes=node0
-            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-            - "discovery.zen.ping.unicast.hosts=elasticsearch_n0,elasticsearch_n1,elasticsearch_n2"
-#- discovery.zen.ping.unicast.hosts=192.168.133.68,192.168.133.75,192.168.133.77
-            - "discovery.zen.minimum_master_nodes=2"
-            - discovery.zen.ping_timeout=120s
-            - client.transport.ping_timeout=60s
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-#        volumes:
-#            - /etc/localtime:/etc/localtime
-#            - ./data/base/es/data/node0:/usr/share/elasticsearch/data
-#            - ./logs/node0:/usr/share/elasticsearch/logs
+    cerebro:
+        image: lmenezes/cerebro:0.8.3
+        container_name: cerebro
         ports:
-            - 9200:9200
-            - 9300:9300
-#        networks:
-#            - esnet
-    
-    elasticsearch_n1:
-        image: elasticsearch:7.2.0
-        container_name: elasticsearch_n1
-        privileged: true
-        environment:
-            - cluster.name=elasticsearch-cluster
-            - node.name=node1
-            - node.master=true
-            - node.data=true
-            - bootstrap.memory_lock=true
-            - search.max_buckets=100000000
-            - http.cors.enabled=true
-            - http.cors.allow-origin=*
-            - cluster.initial_master_nodes=node0
-            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-            - "discovery.zen.ping.unicast.hosts=elasticsearch_n0,elasticsearch_n1,elasticsearch_n2"
-            # 如果是拆分版，这里必须填写宿主机ip
-            #- discovery.zen.ping.unicast.hosts=192.168.133.68,192.168.133.75,192.168.133.77
-            - "discovery.zen.minimum_master_nodes=2"
-            - discovery.zen.ping_timeout=120s
-            - client.transport.ping_timeout=60s
-            # 如果是拆分版，这条配置必须加上，指定当前节点访问的ip
-            #- network.publish_host=192.168.133.75
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-#        volumes:
-#            - /etc/localtime:/etc/localtime
-#            - ./data/base/es/data/node1:/usr/share/elasticsearch/data
-#            - ./logs/node1:/usr/share/elasticsearch/logs
-        ports:
-            - 9201:9200
-            - 9301:9300
-#        networks:
-#            - esnet
-    
-    elasticsearch_n2:
-        image: elasticsearch:7.2.0
-        container_name: elasticsearch_n2
-        privileged: true
-        environment:
-            - cluster.name=elasticsearch-cluster
-            - node.name=node2
-            - node.master=true
-            - node.data=true
-            - bootstrap.memory_lock=true
-            - search.max_buckets=100000000
-            - http.cors.enabled=true
-            - http.cors.allow-origin=*
-            - cluster.initial_master_nodes=node0
-            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
-            - "discovery.zen.ping.unicast.hosts=elasticsearch_n0,elasticsearch_n1,elasticsearch_n2"
-            # 如果是拆分版，这里必须填写宿主机ip
-            #- discovery.zen.ping.unicast.hosts=192.168.133.68,192.168.133.75,192.168.133.77
-            - "discovery.zen.minimum_master_nodes=2"
-            - discovery.zen.ping_timeout=120s
-            - client.transport.ping_timeout=60s
-            # 如果是拆分版，这条配置必须加上，指定当前节点访问的ip
-            #- network.publish_host=192.168.133.77
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-#        volumes:
-#            - /etc/localtime:/etc/localtime
-#            - ./data/base/es/data/node2:/usr/share/elasticsearch/data
-#            - ./logs/node2:/usr/share/elasticsearch/logs
-        ports:
-            - 9202:9200
-            - 9302:9300
-#        networks:
-#            - esnet
-    
+            - "9009:9000"
+        command:
+            - -Dhosts.0.host=http://elasticsearch:9200
     kibana:
         image: kibana:7.2.0
-        container_name: kibana
+        container_name: kibana7
+        environment:
+            - I18N_LOCALE=zh-CN
+            - XPACK_GRAPH_ENABLED=true
+            - TIMELION_ENABLED=true
+            - XPACK_MONITORING_COLLECTION_ENABLED="true"
         ports:
-            - 5601:5601
+            - "5601:5601"
+    elasticsearch:
+        image: elasticsearch:7.2.0
+        container_name: es7_01
+        environment:
+            - cluster.name=zjc-es-cluster
+            - node.name=es7_01
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - discovery.seed_hosts=es7_01
+            - cluster.initial_master_nodes=es7_01,es7_02
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
         volumes:
-#            - /etc/localtime:/etc/localtime
-            - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:rw
-        depends_on:
-            - elasticsearch_n0
-#        networks:
-#            - esnet
-#networks:
-#    esnet:
-#        external: true
+            - es7data1:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+    elasticsearch2:
+        image: elasticsearch:7.2.0
+        container_name: es7_02
+        environment:
+            - cluster.name=zjc-es-cluster
+            - node.name=es7_02
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - discovery.seed_hosts=es7_01
+            - cluster.initial_master_nodes=es7_01,es7_02
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - es7data2:/usr/share/elasticsearch/data
+volumes:
+    es7data1:
+        driver: local
+    es7data2:
+        driver: local

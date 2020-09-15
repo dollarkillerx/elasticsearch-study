@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: kibana
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: kibana
+  template:
+    metadata:
+      labels:
+        service: kibana
+    spec:
+      containers:
+      - env:
+        - name: I18N_LOCALE
+          value: zh-CN
+        - name: TIMELION_ENABLED
+          value: "true"
+        - name: XPACK_GRAPH_ENABLED
+          value: "true"
+        - name: XPACK_MONITORING_COLLECTION_ENABLED
+          value: '"true"'
+        image: kibana:7.2.0
+        name: kibana7
+        ports:
+        - containerPort: 5601
+      restartPolicy: Always
