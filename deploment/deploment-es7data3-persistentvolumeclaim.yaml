@@ -2,8 +2,8 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    service: deploment-es7data2
-  name: deploment-es7data2
+    service: deploment-es7data3
+  name: deploment-es7data3
 spec:
   accessModes:
   - ReadWriteOnce

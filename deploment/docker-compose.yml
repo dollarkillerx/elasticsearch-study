@@ -26,7 +26,7 @@ services:
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - discovery.seed_hosts=es7_01
-            - cluster.initial_master_nodes=es7_01,es7_02
+            - cluster.initial_master_nodes=es7_01,es7_02,es7_03
         ulimits:
             memlock:
                 soft: -1
@@ -44,15 +44,33 @@ services:
             - bootstrap.memory_lock=true
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
             - discovery.seed_hosts=es7_01
-            - cluster.initial_master_nodes=es7_01,es7_02
+            - cluster.initial_master_nodes=es7_01,es7_02,es7_03
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         volumes:
             - es7data2:/usr/share/elasticsearch/data
+    elasticsearch3:
+        image: elasticsearch:7.2.0
+        container_name: es7_03
+        environment:
+            - cluster.name=zjc-es-cluster
+            - node.name=es7_03
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+            - discovery.seed_hosts=es7_01
+            - cluster.initial_master_nodes=es7_01,es7_02,es7_03
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - es7data3:/usr/share/elasticsearch/data
 volumes:
     es7data1:
         driver: local
     es7data2:
+        driver: local
+    es7data3:
         driver: local

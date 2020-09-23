@@ -18,8 +18,14 @@ spec:
       - args:
         - -Dhosts.0.host=http://elasticsearch:9200
         image: lmenezes/cerebro:0.8.3
-        imagePullPolicy: ""
         name: cerebro
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
         ports:
         - containerPort: 9000
       restartPolicy: Always

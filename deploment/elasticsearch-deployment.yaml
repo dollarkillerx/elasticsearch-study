@@ -16,29 +16,93 @@ spec:
       labels:
         service: elasticsearch
     spec:
-      containers:
-      - env:
-        - name: ES_JAVA_OPTS
-          value: -Xms512m -Xmx512m
-        - name: bootstrap.memory_lock
-          value: "true"
-        - name: cluster.initial_master_nodes
-          value: es7_01,es7_02
-        - name: cluster.name
-          value: zjc-es-cluster
-        - name: discovery.seed_hosts
-          value: es7_01
-        - name: node.name
-          value: es7_01
-        image: elasticsearch:7.2.0
-        name: es7-01
-        ports:
-        - containerPort: 9200
-        volumeMounts:
-        - mountPath: /usr/share/elasticsearch/data
-          name: deploment-es7data1
       restartPolicy: Always
       volumes:
-      - name: deploment-es7data1
-        persistentVolumeClaim:
-          claimName: deploment-es7data1
+        - name: deploment-es7data1
+          persistentVolumeClaim:
+            claimName: deploment-es7data1
+        - name: deploment-es7data2
+          persistentVolumeClaim:
+            claimName: deploment-es7data2
+        - name: deploment-es7data3
+          persistentVolumeClaim:
+            claimName: deploment-es7data3
+      containers:
+        - name: es7-01
+          env:
+            - name: ES_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: cluster.initial_master_nodes
+              value: es7_01,es7_02,es7_03
+            - name: cluster.name
+              value: zjc-es-cluster
+            - name: discovery.seed_hosts
+              value: es7_01
+            - name: node.name
+              value: es7_01
+          image: elasticsearch:7.2.0
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "8Gi"
+            limits:
+              cpu: "2000m"
+              memory: "16Gi"
+          ports:
+          - containerPort: 9200
+          volumeMounts:
+          - mountPath: /usr/share/elasticsearch/data
+            name: deploment-es7data1
+        - name: es7-02
+          env:
+            - name: ES_JAVA_OPTS
+              value: -Xms512m -Xmx512m
+            - name: bootstrap.memory_lock
+              value: "true"
+            - name: cluster.initial_master_nodes
+              value: es7_01,es7_02,es7_03
+            - name: cluster.name
+              value: zjc-es-cluster
+            - name: discovery.seed_hosts
+              value: es7_01
+            - name: node.name
+              value: es7_02
+          image: elasticsearch:7.2.0
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "8Gi"
+            limits:
+              cpu: "2000m"
+              memory: "16Gi"
+          volumeMounts:
+            - mountPath: /usr/share/elasticsearch/data
+              name: deploment-es7data2
+        - name: es7-03
+            env:
+                - name: ES_JAVA_OPTS
+                  value: -Xms512m -Xmx512m
+                - name: bootstrap.memory_lock
+                  value: "true"
+                - name: cluster.initial_master_nodes
+                  value: es7_01,es7_02,es7_03
+                - name: cluster.name
+                  value: zjc-es-cluster
+                - name: discovery.seed_hosts
+                  value: es7_01
+                - name: node.name
+                  value: es7_03
+            image: elasticsearch:7.2.0
+            resources:
+              requests:
+                cpu: "1000m"
+                memory: "8Gi"
+              limits:
+                cpu: "2000m"
+                memory: "16Gi"
+            volumeMounts:
+              - mountPath: /usr/share/elasticsearch/data
+                name: deploment-es7data3
+
