@@ -36,11 +36,6 @@ elasticsearch-study
 |GET	|localhost:9200/indices/types/document_ID	|通过ID查询文档|
 |POST	|localhost:9200/indices/types/_search	|查询所有的文档|
 
-作者：Summer2077
-链接：https://www.jianshu.com/p/0b25cecd0599
-来源：简书
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
-
 - 获取服务状态
 ``` 
 GET /_cat/health?v
