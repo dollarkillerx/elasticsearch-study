@@ -290,12 +290,16 @@ GET /summer/user/_search
     "query": {
          "bool": {
             "must": [
-                 "match": {
-                    "nickname": "dollarkiller"
-                 },
-                 "match": {
-                        "name": "summer"
-                  }
+                 {
+                "match": {
+                                "nickname": "dollarkiller"
+                             }
+                },
+                 {
+                      "match": {
+                            "name": "summer"
+                      }
+                }
             ]
         }
      }
